@@ -1,0 +1,2897 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Каталог — Администратор</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            font-size: 14px;
+        }
+
+        /* Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #1a2a3a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #2a3a4a;
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+        }
+
+        .sidebar-header small {
+            font-size: 12px;
+            color: #8aa;
+        }
+
+        .nav-btn {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #2a3a4a;
+        }
+
+        .nav-btn.active {
+            background: #2a3a4a;
+            border-left-color: #00b4b4;
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            background: white;
+            padding: 12px 24px;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        /* Forms */
+        input, select, textarea {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00b4b4;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #00b4b4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #009999;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .btn-outline:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        tr:hover td {
+            background: #f8f9fa;
+        }
+
+        /* Tree */
+        .tree-node {
+            margin-left: 20px;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            gap: 8px;
+        }
+
+        .tree-item:hover {
+            background: #e8f4f4;
+        }
+
+        .tree-item.active {
+            background: #d4ecec;
+            font-weight: 500;
+        }
+
+        .tree-toggle {
+            width: 20px;
+            cursor: pointer;
+        }
+
+        .tree-label {
+            flex: 1;
+        }
+
+        .tree-actions {
+            display: none;
+            gap: 4px;
+        }
+
+        .tree-item:hover .tree-actions {
+            display: flex;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Forms in modal */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Filters */
+        .filters-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters-bar input, .filters-bar select {
+            width: auto;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Parameter rows */
+        .param-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .param-label {
+            width: 150px;
+            font-weight: 500;
+        }
+
+        .param-input {
+            flex: 1;
+        }
+
+        .param-input input, .param-input select {
+            width: 100%;
+        }
+
+        /* Sortable headers */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sortable:hover {
+            background: #e9ecef;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .param-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .param-name {
+            flex: 2;
+            font-weight: 500;
+        }
+        .param-type {
+            flex: 1;
+            color: #666;
+            font-size: 12px;
+        }
+        .param-mandatory {
+            width: 120px;
+        }
+        .param-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Badge cho обязательная */
+        .br {
+            background: #dc3545;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 5px;
+            display: inline-block;
+        }
+
+        .param-value {
+            flex: 1;
+            padding: 6px 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            color: #333;
+            font-size: 13px;
+        }
+
+        /* Chỉ đồng bộ chiều cao 26px cho các thành phần cần thiết */
+        input,
+        select,
+        .filters-bar input,
+        .filters-bar select,
+        .card-header .btn-primary,           /* + Товар */
+        .card-header button:first-child,     /* + (thêm category) */
+        #apply-filters,                      /* Применить */
+        #reset-filters,                      /* Сбросить */
+        .ftog,                               /* Фильтры ▼ */
+        #btn-add-category-param,             /* + Характеристика */
+        .modal-footer .btn-secondary,        /* Отмена */
+        .modal-footer .btn-primary {         /* Сохранить */
+            height: 28px !important;
+            padding: 0 12px !important;
+            font-size: 14px !important;
+            line-height: 28px !important;
+        }
+
+        /* Nút + (hình vuông) */
+        .card-header button:first-child {
+            width: 28px !important;
+            padding: 0 !important;
+            text-align: center !important;
+        }
+
+        /* Ô nhập liệu */
+        input, select, .filters-bar input, .filters-bar select {
+            padding: 0 8px !important;
+            font-size: 14px !important;
+        }
+
+        /* Hiển thị dropdown Выбрать из существующих */
+        #f-char-existing {
+            display: block !important;
+            width: 100% !important;
+            padding: 4px 8px !important;
+            border: 1px solid #ddd !important;
+            border-radius: 4px !important;
+            background: white !important;
+            font-size: 14px !important;
+            line-height: 20px !important;
+            height: auto !important;
+            min-height: 28px !important;
+        }
+
+        .fg {
+            margin-bottom: 15px;
+            overflow: visible !important;
+        }
+        
+        #modal-enum .form-group:has(#enum-param-id) {
+            display: none !important;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>Администратор</h1>
+            <small>Управление каталогом</small>
+        </div>
+        <div class="nav-btn" data-page="catalog">
+            📂 Каталог
+        </div>
+        <div class="nav-btn" data-page="enums">
+            📋 Перечисления
+        </div>
+        <div class="nav-btn" data-page="units">
+            📐 Единицы измерения
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar" id="topbar">Каталог</div>
+        <div class="content">
+            <!-- CATALOG PAGE -->
+            <div id="page-catalog" class="page active">
+                <div style="display: grid; grid-template-columns: 380px 1fr; gap: 20px;">
+                    <!-- Categories tree -->
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>Категории</strong>
+                            <button class="btn-primary btn-sm" onclick="showCategoryModal()">+</button>
+                        </div>
+                        <div class="card-body">
+                            <input type="text" id="category-search" placeholder="Поиск категорий..." style="width: 100%; margin-bottom: 15px;">
+                            <div id="categories-tree"></div>
+                        </div>
+                    </div>
+
+                    <!-- Products -->
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <strong id="current-category-name">Товары</strong>
+                                <button class="btn-primary btn-sm" onclick="showProductModal()">+ Товар</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="filters-bar">
+                                    <input type="text" id="product-search" placeholder="Поиск товаров..." style="width: 200px;">
+                                    <button class="ftog" id="btn-toggle-filters">Фильтры ▼</button>
+                                </div>
+                                <!-- Фильтры панель  -->
+                                <div id="filters-panel" style="display: none; margin-top: 15px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 8px;">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Тема</label>
+                                            <select id="filter-theme">
+                                                <option value="">— любая —</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Цвет</label>
+                                            <select id="filter-color">
+                                                <option value="">— любой —</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Высота от (см)</label>
+                                            <input type="number" id="filter-height-min" placeholder="от">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Высота до (см)</label>
+                                            <input type="number" id="filter-height-max" placeholder="до">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Длина от (см)</label>
+                                            <input type="number" id="filter-length-min" placeholder="от" min="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Длина до (см)</label>
+                                            <input type="number" id="filter-length-max" placeholder="до" min="0">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Ширина от (см)</label>
+                                            <input type="number" id="filter-width-min" placeholder="от" min="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Ширина до (см)</label>
+                                            <input type="number" id="filter-width-max" placeholder="до" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Диаметр от (см)</label>
+                                            <input type="number" id="filter-diam-min" placeholder="от">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Диаметр до (см)</label>
+                                            <input type="number" id="filter-diam-max" placeholder="до">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Цена от</label>
+                                            <input type="number" id="filter-price-min" placeholder="от">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Цена до</label>
+                                            <input type="number" id="filter-price-max" placeholder="до">
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                                        <button class="btn-primary btn-sm" id="apply-filters">Применить</button>
+                                        <button class="btn-secondary btn-sm" id="reset-filters">Сбросить</button>
+                                    </div>
+                                </div>
+                                <div id="products-table"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENUMS PAGE -->
+            <div id="page-enums" class="page">
+                <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>Перечисления</strong>
+                            <button class="btn-primary btn-sm" onclick="showEnumModal()">+</button>
+                        </div>
+                        <div class="card-body" id="enums-list"></div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <strong id="current-enum-name">Значения</strong>
+                                <button class="btn-primary btn-sm" onclick="showEnumItemModal()">+ Значение</button>
+                            </div>
+                            <div class="card-body">
+                                <div id="enum-items-table"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UNITS PAGE -->
+            <div id="page-units" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Единицы измерения</strong>
+                        <button class="btn-primary btn-sm" onclick="showUnitModal()">+</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="units-table"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div id="modal-category" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="category-modal-title">Новая категория</h3>
+            <button onclick="closeModal('modal-category')" style="background: none; border: none; font-size: 20px;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" id="cat-name">
+            </div>
+            <div class="form-group">
+                <label>Код</label>
+                <input type="text" id="cat-code">
+            </div>
+            <div class="form-group">
+                <label>Родительская категория</label>
+                <select id="cat-parent"></select>
+            </div>
+            <div class="form-group">
+                <label>Базовая единица измерения</label>
+                <select id="cat-base-unit"></select>
+            </div>
+            <div class="section-sep">
+                <div class="section-label">
+                    <span>Характеристики категории</span>
+                    <button class="btn-secondary btn-sm" type="button" id="btn-add-category-param">+ Характеристика</button>
+                </div>
+                <div id="category-params-list" style="margin-top: 10px;">
+                    <div class="loading">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('modal-category')">Отмена</button>
+            <button class="btn-primary" onclick="saveCategory()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div id="modal-product" class="modal">
+    <div class="modal-content" style="width: 600px;">
+        <div class="modal-header">
+            <h3 id="product-modal-title">Новый товар</h3>
+            <button onclick="closeModal('modal-product')" style="background: none; border: none; font-size: 20px;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Название</label>
+                    <input type="text" id="prod-name">
+                </div>
+                <div class="form-group">
+                    <label>Код</label>
+                    <input type="text" id="prod-code">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Цена</label>
+                    <input type="number" id="prod-price" min="0" step="any" onkeydown="return event.key !== '-'" oninput="if(this.value < 0) this.value = 0">
+                </div>
+                <div class="form-group">
+                    <label>Единица измерения</label>
+                    <select id="prod-unit"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Категория</label>
+                <select id="prod-category"></select>
+            </div>
+            <!--<div id="prod-params-container"></div>-->
+            <div class="section-sep">
+                <div class="section-label">
+                    <span>Характеристики товара</span>
+                </div>
+                <div id="prod-params-container"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('modal-product')">Отмена</button>
+            <button class="btn-primary" onclick="saveProduct()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- ENUM MODAL -->
+<div id="modal-enum" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="enum-modal-title">Новое перечисление</h3>
+            <button onclick="closeModal('modal-enum')" style="background: none; border: none; font-size: 20px;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" id="enum-name">
+            </div>
+            <div class="form-group">
+                <label>Код</label>
+                <input type="text" id="enum-code">
+            </div>
+            <div class="form-group">
+                <label>Связанная характеристика</label>
+                <select id="enum-param-id">
+                    <option value="">— не выбрана —</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('modal-enum')">Отмена</button>
+            <button class="btn-primary" onclick="saveEnum()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- ENUM ITEM MODAL -->
+<div id="modal-enumitem" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="enumitem-modal-title">Новое значение</h3>
+            <button onclick="closeModal('modal-enumitem')" style="background: none; border: none; font-size: 20px;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" id="enumitem-name">
+            </div>
+            <div class="form-group">
+                <label>Код</label>
+                <input type="text" id="enumitem-code">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('modal-enumitem')">Отмена</button>
+            <button class="btn-primary" onclick="saveEnumItem()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- UNIT MODAL -->
+<div id="modal-unit" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="unit-modal-title">Новая единица измерения</h3>
+            <button onclick="closeModal('modal-unit')" style="background: none; border: none; font-size: 20px;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" id="unit-name">
+            </div>
+            <div class="form-group">
+                <label>Обозначение</label>
+                <input type="text" id="unit-short">
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="unit-integer-only" style="width: auto; margin: 0;">
+                <label style="margin: 0; font-weight: normal;">Только целые числа</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('modal-unit')">Отмена</button>
+            <button class="btn-primary" onclick="saveUnit()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = 'http://localhost:8001';
+    let currentCategoryId = null;
+    let currentEnumId = null;
+    let currentProductId = null;
+    let allCategories = [];
+    let expandedState = {};
+
+    // Helper functions
+    async function fetchAPI(url, options = {}) {
+        const response = await fetch(API + url, {
+            headers: { 'Content-Type': 'application/json' },
+            ...options
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'API Error');
+        }
+        return response.json();
+    }
+
+    function showModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    // ============ CATEGORIES ============
+    async function loadCategories() {
+        try {
+            const data = await fetchAPI('/categories/tree');
+            allCategories = data;
+            renderTree(data);
+            
+            const searchInput = document.getElementById('category-search');
+            searchInput.removeEventListener('input', window.categorySearchHandler);
+            window.categorySearchHandler = function(e) {
+                const keyword = e.target.value.trim().toLowerCase();
+                if (!keyword) {
+                    renderTree(allCategories);
+                    return;
+                }
+                
+                function filterTree(nodes) {
+                    const result = [];
+                    for (const node of nodes) {
+                        const matches = node.name.toLowerCase().includes(keyword);
+                        const filteredChildren = node.children ? filterTree(node.children) : [];
+                        if (matches || filteredChildren.length > 0) {
+                            result.push({
+                                ...node,
+                                children: filteredChildren
+                            });
+                        }
+                    }
+                    return result;
+                }
+                
+                const filtered = filterTree(allCategories);
+                renderTree(filtered);
+            };
+            searchInput.addEventListener('input', window.categorySearchHandler);
+            
+        } catch (e) {
+            console.error('Error loading categories:', e);
+        }
+    }
+
+    function renderTree(nodes, level = 0) {
+        const container = document.getElementById('categories-tree');
+        if (level === 0) {
+            container.innerHTML = '';
+        }
+        for (const node of nodes) {
+            const hasChildren = node.children && node.children.length;
+            const isExpanded = expandedState[node.id] !== false; // Mặc định mở
+            
+            const div = document.createElement('div');
+            div.className = 'tree-item';
+            div.style.paddingLeft = (level * 20 + 8) + 'px';
+            div.innerHTML = `
+                <span class="tree-toggle" onclick="toggleTreeNode(this)">${hasChildren ? (isExpanded ? '▼' : '▶') : ' '}</span>
+                <span class="tree-label" data-id="${node.id}" data-name="${node.name}" onclick="selectCategory(${node.id}, '${node.name}')">📁 ${node.name}</span>
+                <span class="tree-actions">
+                    <button class="btn-outline btn-sm move-up" data-id="${node.id}">▲</button>
+                    <button class="btn-outline btn-sm move-down" data-id="${node.id}">▼</button>
+                    <button class="btn-outline btn-sm" onclick="editCategory(${node.id}, '${node.name}', '${node.code}')">✏️</button>
+                    <button class="btn-danger btn-sm" onclick="deleteCategory(${node.id})">✕</button>
+                </span>
+            `;
+            container.appendChild(div);
+            
+            if (hasChildren) {
+                const childDiv = document.createElement('div');
+                childDiv.className = 'tree-node';
+                childDiv.style.display = isExpanded ? 'block' : 'none';
+                container.appendChild(childDiv);
+                renderTreeChildren(node.children, childDiv, level + 1);
+            }
+        }
+    }
+
+    function renderTreeChildren(children, parentDiv, level) {
+        for (const child of children) {
+            const hasChildren = child.children && child.children.length;
+            const isExpanded = expandedState[child.id] !== false;
+            
+            const div = document.createElement('div');
+            div.className = 'tree-item';
+            div.style.paddingLeft = (level * 20 + 8) + 'px';
+            div.innerHTML = `
+                <span class="tree-toggle" onclick="toggleTreeNode(this)">${hasChildren ? (isExpanded ? '▼' : '▶') : ' '}</span>
+                <span class="tree-label" data-id="${child.id}" data-name="${child.name}" onclick="selectCategory(${child.id}, '${child.name}')">📁 ${child.name}</span>
+                <span class="tree-actions">
+                    <button class="btn-outline btn-sm move-up" data-id="${child.id}">▲</button>
+                    <button class="btn-outline btn-sm move-down" data-id="${child.id}">▼</button>
+                    <button class="btn-outline btn-sm" onclick="editCategory(${child.id}, '${child.name}', '${child.code}')">✏️</button>
+                    <button class="btn-danger btn-sm" onclick="deleteCategory(${child.id})">✕</button>
+                </span>
+            `;
+            parentDiv.appendChild(div);
+            
+            if (hasChildren) {
+                const childDiv = document.createElement('div');
+                childDiv.className = 'tree-node';
+                childDiv.style.display = isExpanded ? 'block' : 'none';
+                parentDiv.appendChild(childDiv);
+                renderTreeChildren(child.children, childDiv, level + 1);
+            }
+        }
+    }
+    function toggleTreeNode(btn) {
+        const parent = btn.parentElement;
+        const next = parent.nextElementSibling;
+        if (next && next.classList.contains('tree-node')) {
+            const isOpen = next.style.display !== 'none';
+            next.style.display = isOpen ? 'none' : 'block';
+            btn.textContent = isOpen ? '▶' : '▼';
+            
+            // Lưu trạng thái
+            const label = parent.querySelector('.tree-label');
+            const id = label?.dataset.id;
+            if (id) {
+                expandedState[id] = !isOpen;
+            }
+        }
+    }
+
+    async function selectCategory(id, name) {
+        currentCategoryId = id;
+        document.getElementById('current-category-name').innerHTML = `${name} - Товары`;
+        await loadProducts();
+        const searchInput = document.getElementById('product-search');
+        searchInput.removeEventListener('input', window.productSearchHandler);
+        window.productSearchHandler = function() {
+            loadProducts();
+        };
+        searchInput.addEventListener('input', window.productSearchHandler);
+        await loadCategoryParameters(id);
+    }
+
+    async function loadCategoryParameters(categoryId) {
+        try {
+            const params = await fetchAPI(`/categories/${categoryId}/parameters`);
+            const container = document.getElementById('product-params-card');
+            const listContainer = document.getElementById('product-params-list');
+            
+            if (params && params.length > 0) {
+                container.style.display = 'block';
+                listContainer.innerHTML = '';
+                for (const p of params) {
+                    listContainer.innerHTML += `
+                        <div class="param-row" data-param-id="${p.id_parameter}" data-param-type="${p.param_type_code}">
+                            <div class="param-label">${p.name}</div>
+                            <div class="param-input" id="param-input-${p.id_parameter}">
+                                <span class="loading">Загрузка...</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                container.style.display = 'none';
+            }
+        } catch (e) {
+            console.error('Error loading category parameters:', e);
+        }
+    }
+
+    async function loadProductParameterValues(productId) {
+        console.log("Loading parameters for product:", productId);
+        try {
+            const params = await fetchAPI(`/products/${productId}/parameters`);
+            console.log("Parameters received:", params);
+            
+            for (const p of params) {
+                const container = document.getElementById(`param-input-${p.id_parameter}`);
+                if (!container) continue;
+                
+                if (p.param_type_code === 'enum') {
+                    const enumValues = await fetchAPI(`/parameters/${p.id_parameter}/enum-values`);
+                    let select = `<select data-param-id="${p.id_parameter}" class="param-select">`;
+                    select += `<option value="">— Выберите —</option>`;
+                    for (const ev of enumValues) {
+                        const selected = (p.value === ev.value_name) ? 'selected' : '';
+                        select += `<option value="${ev.id_enum_value}" ${selected}>${ev.value_name}</option>`;
+                    }
+                    select += `</select>`;
+                    container.innerHTML = select;
+                } else if (p.param_type_code === 'integer') {
+                    container.innerHTML = `<input type="number" class="param-input-number" data-param-id="${p.id_parameter}" value="${p.value || ''}">`;
+                } else {
+                    container.innerHTML = `<input type="text" class="param-input-text" data-param-id="${p.id_parameter}" value="${p.value || ''}">`;
+                }
+            }
+        } catch (e) {
+            console.error('Error loading product parameters:', e);
+            for (const p of await fetchAPI(`/categories/${currentCategoryId}/parameters`)) {
+                const container = document.getElementById(`param-input-${p.id_parameter}`);
+                if (container) container.innerHTML = `<span style="color:red;">Ошибка загрузки</span>`;
+            }
+        }
+    }
+
+    async function saveProductParameters(productId) {
+        const selects = document.querySelectorAll('#prod-params-container .param-select');
+        for (const select of selects) {
+            const paramId = select.dataset.paramId;
+            const valueEnum = select.value;
+            if (valueEnum) {
+                await fetchAPI(`/products/${productId}/parameters/${paramId}?value_enum=${valueEnum}`, { method: 'PUT' });
+            }
+        }
+        
+        const intInputs = document.querySelectorAll('#prod-params-container .param-input-number');
+        for (const input of intInputs) {
+            const paramId = input.dataset.paramId;
+            const valueInt = input.value;
+            if (valueInt !== undefined && valueInt !== '') {
+                await fetchAPI(`/products/${productId}/parameters/${paramId}?value_integer=${valueInt}`, { method: 'PUT' });
+            }
+        }
+        
+        const textInputs = document.querySelectorAll('#prod-params-container .param-input-text');
+        for (const input of textInputs) {
+            const paramId = input.dataset.paramId;
+            const valueText = input.value;
+            if (valueText !== undefined && valueText !== '') {
+                await fetchAPI(`/products/${productId}/parameters/${paramId}?value_string=${encodeURIComponent(valueText)}`, { method: 'PUT' });
+            }
+        }
+    }
+
+    function showCategoryModal(category = null) {
+        document.getElementById('category-modal-title').textContent = category ? 'Редактировать категорию' : 'Новая категория';
+        document.getElementById('cat-name').value = category ? category.name : '';
+        document.getElementById('cat-code').value = category ? category.code : '';
+        
+        window.currentCategoryEdit = category;
+        currentEditingCategoryId = category ? category.id : null;
+        
+        Promise.all([
+            fetchAPI('/categories/flat'),
+            fetchAPI('/units')
+        ]).then(([categories, units]) => {
+            const parentSelect = document.getElementById('cat-parent');
+            parentSelect.innerHTML = '<option value="">— Нет (корневая) —</option>';
+            
+            for (const cat of categories) {
+                if (category && Number(cat.id) === Number(category.id)) continue;
+                const isSelected = category && Number(category.parent_id) === Number(cat.id);
+                parentSelect.innerHTML += `<option value="${cat.id}" ${isSelected ? 'selected' : ''}>${cat.name}</option>`;
+            }
+            
+            const unitSelect = document.getElementById('cat-base-unit');
+            unitSelect.innerHTML = '<option value="">— Не выбрана —</option>';
+            units.forEach(u => {
+                unitSelect.innerHTML += `<option value="${u.id_unit}" ${category && category.base_unit_id === u.id_unit ? 'selected' : ''}>${u.name} (${u.short_name})</option>`;
+            });
+            
+            showModal('modal-category');
+        }).catch(e => {
+            console.error('Error loading data:', e);
+            showModal('modal-category');
+        });
+        
+        if (category) {
+            loadCategoryParametersForEdit(category.id);
+        } else {
+            document.getElementById('category-params-list').innerHTML = '<div class="loading">Сначала сохраните категорию</div>';
+        }
+    }
+
+    function editCategory(id, name, code) {
+        fetchAPI(`/categories/${id}/details`).then(category => {
+            showCategoryModal({ 
+                id: category.id, 
+                name: category.name, 
+                code: category.code, 
+                parent_id: category.parent_id, 
+                base_unit_id: category.base_unit_id
+            });
+        }).catch(() => {
+            showCategoryModal({ id, name, code, parent_id: null, base_unit_id: null });
+        });
+    }
+
+    async function saveCategory() {
+        const name = document.getElementById('cat-name').value;
+        const code = document.getElementById('cat-code').value;
+        const parentId = document.getElementById('cat-parent').value;
+        const baseUnitId = document.getElementById('cat-base-unit').value;
+        
+        if (!name || !code) {
+            showMessageModal("Введите название и код", true);
+            return;
+        }
+        
+        try {
+            if (window.currentCategoryEdit) {
+                let url = `/categories/${window.currentCategoryEdit.id}?name=${encodeURIComponent(name)}&code=${encodeURIComponent(code)}`;
+                if (parentId) url += `&parent_id=${parentId}`;
+                if (baseUnitId) url += `&base_unit_id=${baseUnitId}`;
+                await fetchAPI(url, { method: 'PUT' });
+                showMessageModal("Категория успешно обновлена!");  // ← THÊM
+            } else {
+                let url = `/categories?name=${encodeURIComponent(name)}&code=${encodeURIComponent(code)}`;
+                if (parentId) url += `&parent_id=${parentId}`;
+                if (baseUnitId) url += `&base_unit_id=${baseUnitId}`;
+                await fetchAPI(url, { method: 'POST' });
+                showMessageModal("Категория успешно создана!");    // ← THÊM
+            }
+            closeModal('modal-category');
+            await loadCategories();
+            // Reset currentEditingCategoryId
+            currentEditingCategoryId = null;
+        } catch (e) {
+            showMessageModal("Ошибка: " + e.message, true);
+        }
+    }
+
+    async function deleteCategory(id) {
+        let categoryName = "";
+        const treeItem = document.querySelector(`.tree-item .tree-label[data-id="${id}"]`);
+        if (treeItem) {
+            categoryName = treeItem.textContent;
+        }
+        
+        showConfirmModal(`Удалить категорию "${categoryName}"? Все подкатегории и товары будут также удалены.`, async () => {
+            try {
+                await fetchAPI(`/categories/${id}`, { method: 'DELETE' });
+                await loadCategories();
+                if (currentCategoryId === id) {
+                    currentCategoryId = null;
+                    document.getElementById('current-category-name').innerHTML = 'Товары';
+                    document.getElementById('products-table').innerHTML = '<div class="loading">Выберите категорию</div>';
+                }
+            } catch (e) {
+                showMessageModal("Ошибка: " + e.message, true);
+            }
+        });
+    }
+
+    // ============ PRODUCTS ============
+    async function loadProducts() {
+        if (!currentCategoryId) {
+            document.getElementById('products-table').innerHTML = '<div class="loading">Выберите категорию слева</div>';
+            return;
+        }
+        
+        const search = document.getElementById('product-search').value;
+        
+        let url = `/categories/${currentCategoryId}/products`;
+        try {
+            let products = await fetchAPI(url);
+            let items = products.items || [];
+            
+            // Filter by search
+            if (search) {
+                items = items.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.code.toLowerCase().includes(search.toLowerCase()));
+            }
+            
+            renderProducts(items);
+        } catch (e) {
+            console.error('Error loading products:', e);
+        }
+    }
+
+
+    function renderProducts(products) {
+        currentProducts = products;
+        const container = document.getElementById('products-table');
+        if (!products || products.length === 0) {
+            container.innerHTML = '<div class="loading">Нет товаров</div>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            Название
+                            <button class="sort-btn" data-sort="name" style="background: none; border: none; cursor: pointer; margin-left: 5px;">
+                                <span id="sort-asc-name" style="color:#ccc; font-size:12px;">↑</span>
+                                <span id="sort-desc-name" style="color:#ccc; font-size:12px;">↓</span>
+                            </button>
+                        </th>
+                        <th>Код</th>
+                        <th>
+                            Цена
+                            <button class="sort-btn" data-sort="price" style="background: none; border: none; cursor: pointer; margin-left: 5px;">
+                                <span id="sort-asc-price" style="color:#ccc; font-size:12px;">↑</span>
+                                <span id="sort-desc-price" style="color:#ccc; font-size:12px;">↓</span>
+                            </button>
+                        </th>
+                        <th>Ед.изм.</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${products.map(p => `
+                        <tr>
+                            <td>${p.name}</td>
+                            <td>${p.code}</td>
+                            <td>${p.price} ₽</td>
+                            <td>${p.unit_name || ''}</td>
+                            <td>
+                                <button class="btn-outline btn-sm edit-product-btn" data-id="${p.id_product}">✏️</button>
+                                <button class="btn-outline btn-sm params-btn" data-id="${p.id_product}" data-name="${p.name.replace(/'/g, "\\'")}">📋 Характеристики</button>
+                                <button class="btn-danger btn-sm delete-product-btn" data-id="${p.id_product}">✕</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const sortField = btn.dataset.sort;
+                sortProducts(sortField);
+            });
+        });
+        
+        document.querySelectorAll('.params-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                const name = btn.dataset.name;
+                editProductParams(id, name);
+            });
+        });
+        
+        document.querySelectorAll('.edit-product-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                editProduct(id);
+            });
+        });
+        
+        document.querySelectorAll('.delete-product-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                deleteProduct(id);
+            });
+        });
+    }
+
+    let currentProducts = [];
+    let currentSortField = null;
+    let currentSortAsc = true;
+
+    function sortProducts(field) {
+        if (!currentProducts.length) return;
+        
+        if (currentSortField === field) {
+            currentSortAsc = !currentSortAsc;
+        } else {
+            currentSortField = field;
+            currentSortAsc = true;
+        }
+        
+        const sorted = [...currentProducts];
+        if (field === 'name') {
+            sorted.sort((a, b) => currentSortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+        } else if (field === 'price') {
+            sorted.sort((a, b) => currentSortAsc ? a.price - b.price : b.price - a.price);
+        }
+        
+        renderProducts(sorted);
+        
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            const btnField = btn.dataset.sort;
+            const ascSpan = btn.querySelector(`#sort-asc-${btnField}`);
+            const descSpan = btn.querySelector(`#sort-desc-${btnField}`);
+            if (btnField === currentSortField) {
+                if (ascSpan) ascSpan.style.color = currentSortAsc ? '#006060' : '#ccc';
+                if (descSpan) descSpan.style.color = !currentSortAsc ? '#006060' : '#ccc';
+            } else {
+                if (ascSpan) ascSpan.style.color = '#ccc';
+                if (descSpan) descSpan.style.color = '#ccc';
+            }
+        });
+    }
+
+    function showProductModal(product = null) {
+        document.getElementById('product-modal-title').textContent = product ? 'Редактировать товар' : 'Новый товар';
+        document.getElementById('prod-name').value = product ? product.name : '';
+        document.getElementById('prod-code').value = product ? product.code : '';
+        document.getElementById('prod-price').value = product ? product.price : '';
+        
+        // Load units
+        fetchAPI('/units').then(units => {
+            const unitSelect = document.getElementById('prod-unit');
+            unitSelect.innerHTML = '';
+            units.forEach(u => {
+                unitSelect.innerHTML += `<option value="${u.id_unit}" ${product && product.unit_id === u.id_unit ? 'selected' : ''}>${u.name} (${u.short_name})</option>`;
+            });
+            
+            // 🔥 XÓA toàn bộ logic updatePriceStep
+            // Chỉ giữ onchange để reload parameters khi đổi đơn vị
+            unitSelect.onchange = async () => {
+                const catId = parseInt(document.getElementById('prod-category').value);
+                if (catId) {
+                    await loadCategoryParamsForProduct(catId, product ? product.id_product : null);
+                }
+            };
+        });
+        
+        fetchAPI('/categories/tree').then(cats => {
+            const catSelect = document.getElementById('prod-category');
+            catSelect.innerHTML = '';
+            
+            function collectLeafCategories(nodes, prefix = '') {
+                for (const node of nodes) {
+                    const hasChildren = node.children && node.children.length > 0;
+                    if (!hasChildren) {
+                        const selectedAttr = (product && product.category_id === node.id) ? 'selected' : '';
+                        catSelect.innerHTML += `<option value="${node.id}" ${selectedAttr}>${prefix}${node.name}</option>`;
+                    } else {
+                        collectLeafCategories(node.children, prefix + '— ');
+                    }
+                }
+            }
+            
+            collectLeafCategories(cats);
+            
+            const selectedCatId = catSelect.value;
+            if (selectedCatId) {
+                loadCategoryParamsForProduct(parseInt(selectedCatId), product ? product.id_product : null);
+            }
+        });
+        
+        const catSelect = document.getElementById('prod-category');
+        catSelect.onchange = () => {
+            const catId = parseInt(catSelect.value);
+            if (catId) {
+                loadCategoryParamsForProduct(catId, product ? product.id_product : null);
+            }
+        };
+        
+        window.currentProductEdit = product;
+        showModal('modal-product');
+    }
+
+    async function editProduct(id) {
+        console.log("Edit product ID:", id);
+        try {
+            const product = await fetchAPI(`/products/${id}`);
+            window.currentProductEdit = product;
+            
+            showProductModal(product);
+        } catch (err) {
+            console.error(err);
+            showMessageModal("Ошибка загрузки товара: " + err.message, true);
+        }
+    }
+
+    async function saveProduct() {
+        const name = document.getElementById('prod-name').value;
+        const code = document.getElementById('prod-code').value;
+        const price = parseFloat(document.getElementById('prod-price').value);
+        const categoryId = parseInt(document.getElementById('prod-category').value);
+        const unitId = parseInt(document.getElementById('prod-unit').value);
+
+        if (!name || !code) {
+            showMessageModal("Введите название и код товара", true);
+            return;
+        }
+        
+        if (isNaN(price) || price < 0) {
+            showMessageModal("Введите корректную цену", true);
+            return;
+        }
+
+        // 🔥 KIỂM TRA CÁC TRƯỜNG BẮT BUỘC (ОБЯЗАТЕЛЬНЫЕ)
+        try {
+            const params = await fetchAPI(`/categories/${categoryId}/parameters`);
+            
+            for (const p of params) {
+                if (p.is_mandatory) {
+                    const input = document.getElementById(`param-${p.id_parameter}`);
+                    if (input) {
+                        let value = input.value;
+                        if (p.param_type_code === 'enum') {
+                            if (!value || value === '' || value === '— Выберите —') {
+                                showMessageModal(`Пожалуйста, заполните обязательное поле: "${p.name}"`, true);
+                                return;
+                            }
+                        } else if (p.param_type_code === 'integer') {
+                            if (value === undefined || value === null || value === '') {
+                                showMessageModal(`Пожалуйста, заполните обязательное поле: "${p.name}"`, true);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch(e) {
+            console.error("Error checking mandatory fields:", e);
+        }
+
+        try {
+            if (window.currentProductEdit) {
+                await fetchAPI(`/products/${window.currentProductEdit.id_product}?name=${encodeURIComponent(name)}&price=${price}&code=${encodeURIComponent(code)}&unit_id=${unitId}&category_id=${categoryId}`, { method: 'PUT' });
+                await saveProductParameters(window.currentProductEdit.id_product);
+                showMessageModal("Товар успешно обновлен!");
+            } else {
+                const newProduct = await fetchAPI(`/products?name=${encodeURIComponent(name)}&code=${encodeURIComponent(code)}&category_id=${categoryId}&unit_id=${unitId}&price=${price}`, { method: 'POST' });
+                if (newProduct && newProduct.id_product) {
+                    await saveProductParameters(newProduct.id_product);
+                }
+                showMessageModal("Товар успешно создан!");
+            }
+            closeModal('modal-product');
+            await loadProducts();
+            window.currentProductEdit = null;
+        } catch (e) {
+            showMessageModal("Ошибка: " + (e.message || "Не удалось сохранить товар"), true);
+        }
+    }
+
+    async function deleteProduct(id) {
+        const name = document.querySelector(`.delete-product-btn[data-id="${id}"]`).closest('tr').querySelector('td:first-child').textContent;
+        showConfirmModal(`Удалить товар "${name}"?`, async () => {
+            try {
+                await fetchAPI(`/products/${id}`, { method: 'DELETE' });
+                await loadProducts();
+            } catch (e) {
+                showMessageModal("Ошибка: " + e.message, true);
+            }
+        });
+    }
+
+    function showConfirmModal(message, onConfirm) {
+        document.getElementById('del-target').innerHTML = message;
+        
+        const okBtn = document.getElementById('m-del-ok');
+        const oldOnClick = okBtn.onclick;
+        
+        okBtn.onclick = () => {
+            onConfirm();
+            closeModal('m-del');
+            okBtn.onclick = oldOnClick;
+        };
+        
+        showModal('m-del');
+    }
+
+    function showMessageModal(message, isError = false) {
+        const title = document.getElementById('m-msg-title');
+        const text = document.getElementById('m-msg-text');
+        const okBtn = document.getElementById('m-msg-ok');
+        
+        if (isError) {
+            title.innerHTML = "❌ Ошибка";
+            okBtn.style.background = "#dc3545";
+        } else {
+            title.innerHTML = "Успешно";
+            okBtn.style.background = "#28a745";
+        }
+        
+        text.innerHTML = message;
+        okBtn.onclick = () => closeModal('m-msg');
+        
+        showModal('m-msg');
+    }
+
+    // ============ ENUMS ============
+    async function loadEnums() {
+        try {
+            const enums = await fetchAPI('/enums');
+            const container = document.getElementById('enums-list');
+            container.innerHTML = '';
+            for (const e of enums) {
+                const div = document.createElement('div');
+                div.className = 'tree-item';
+                div.innerHTML = `
+                    <span class="tree-label" onclick="selectEnum(${e.id_enum}, '${e.name}')">📋 ${e.name}</span>
+                    <span class="tree-actions">
+                        <button class="btn-outline btn-sm" onclick="editEnum(${e.id_enum}, '${e.name}', '${e.code}')">✏️</button>
+                        <button class="btn-danger btn-sm" onclick="deleteEnum(${e.id_enum})">✕</button>
+                    </span>
+                `;
+                container.appendChild(div);
+            }
+            if (enums.length > 0 && !currentEnumId) {
+                selectEnum(enums[0].id_enum, enums[0].name);
+            }
+        } catch (e) {
+            console.error('Error loading enums:', e);
+        }
+    }
+
+    async function loadParametersForEnum() {
+        try {
+            const params = await fetchAPI('/parameters-for-enum');
+            const select = document.getElementById('enum-param-id');
+            select.innerHTML = '<option value="">— не выбрана —</option>';
+            params.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name} (${p.code})</option>`;
+            });
+        } catch(e) {
+            console.error("Error loading parameters:", e);
+        }
+    }
+
+    async function selectEnum(id, name) {
+        currentEnumId = id;
+        document.getElementById('current-enum-name').innerHTML = `${name} - Значения`;
+        await loadEnumItems(id);
+    }
+
+    async function loadEnumItems(enumId) {
+        try {
+            const items = await fetchAPI(`/enums/${enumId}/items`);
+            const container = document.getElementById('enum-items-table');
+            if (!items || items.length === 0) {
+                container.innerHTML = '<div class="loading">Нет значений</div>';
+                return;
+            }
+            container.innerHTML = `
+                <table>
+                    <thead><tr><th>Порядок</th><th>Название</th><th>Код</th><th>Действия</th></tr></thead>
+                    <tbody>
+                        ${items.map(item => `
+                            <tr>
+                                <td>${item.order_num}</td>
+                                <td>${item.item_name}</td>
+                                <td>${item.item_code}</td>
+                                <td>
+                                    <button class="btn-outline btn-sm" onclick="moveEnumItemUp(${item.id_item})">▲</button>
+                                    <button class="btn-outline btn-sm" onclick="moveEnumItemDown(${item.id_item})">▼</button>
+                                    <button class="btn-outline btn-sm" onclick="editEnumItem(${item.id_item}, '${item.item_name}', '${item.item_code}')">✏️</button>
+                                    <button class="btn-danger btn-sm" onclick="deleteEnumItem(${item.id_item})">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } catch (e) {
+            console.error('Error loading enum items:', e);
+        }
+    }
+
+    function showEnumModal(enumObj = null) {
+        document.getElementById('enum-modal-title').textContent = enumObj ? 'Редактировать перечисление' : 'Новое перечисление';
+        document.getElementById('enum-name').value = enumObj ? enumObj.name : '';
+        document.getElementById('enum-code').value = enumObj ? enumObj.code : '';
+        document.getElementById('enum-param-id').value = enumObj ? (enumObj.param_id || '') : '';
+        
+        window.currentEnumEdit = enumObj;
+        loadParametersForEnum();  // 🔥 THÊM DÒNG NÀY
+        showModal('modal-enum');
+    }
+
+    function editEnum(id, name, code) {
+        showEnumModal({ id_enum: id, name, code });
+    }
+
+    async function saveEnum() {
+        const name = document.getElementById('enum-name').value;
+        const code = document.getElementById('enum-code').value;
+        let paramId = document.getElementById('enum-param-id').value;
+        
+        if (!name || !code) {
+            showMessageModal("Введите название и код", true);
+            return;
+        }
+        
+        try {
+            let url;
+            if (window.currentEnumEdit) {
+                url = `/enums/${window.currentEnumEdit.id_enum}?name=${encodeURIComponent(name)}&code=${encodeURIComponent(code)}`;
+                if (paramId && paramId !== "") {
+                    url += `&param_id=${paramId}`;
+                }
+                await fetchAPI(url, { method: 'PUT' });
+                showMessageModal("Перечисление успешно обновлено!");
+            } else {
+                url = `/enums?name=${encodeURIComponent(name)}&code=${encodeURIComponent(code)}`;
+                // 🔥 CHỈ THÊM param_id NẾU CÓ GIÁ TRỊ
+                if (paramId && paramId !== "") {
+                    url += `&param_id=${paramId}`;
+                }
+                await fetchAPI(url, { method: 'POST' });
+                showMessageModal("Перечисление успешно создано!");
+            }
+            closeModal('modal-enum');
+            await loadEnums();
+        } catch (e) {
+            console.error("Error:", e);
+            showMessageModal("Ошибка: " + (e.message || "Не удалось сохранить"), true);
+        }
+    }
+
+    async function deleteEnum(id) {
+        const enumName = document.querySelector(`#enums-list .tree-item .tree-label[onclick*="selectEnum(${id},"]`).textContent;
+        showConfirmModal(`Удалить перечисление "${enumName}"? Все значения будут также удалены.`, async () => {
+            try {
+                await fetchAPI(`/enums/${id}`, { method: 'DELETE' });
+                currentEnumId = null;
+                await loadEnums();
+            } catch (e) {
+                showMessageModal("Ошибка: " + e.message, true);
+            }
+        });
+    }
+
+    function showEnumItemModal(item = null) {
+        document.getElementById('enumitem-modal-title').textContent = item ? 'Редактировать значение' : 'Новое значение';
+        document.getElementById('enumitem-name').value = item ? item.item_name : '';
+        document.getElementById('enumitem-code').value = item ? item.item_code : '';
+        window.currentEnumItemEdit = item;
+        showModal('modal-enumitem');
+    }
+
+    function editEnumItem(id, name, code) {
+        showEnumItemModal({ id_item: id, item_name: name, item_code: code });
+    }
+
+    async function saveEnumItem() {
+        const name = document.getElementById('enumitem-name').value;
+        const code = document.getElementById('enumitem-code').value;
+        
+        if (!name || !code) {
+            showMessageModal("Введите название и код", true);
+            return;
+        }
+        
+        try {
+            if (window.currentEnumItemEdit) {
+                await fetchAPI(`/enum-items/${window.currentEnumItemEdit.id_item}?item_name=${encodeURIComponent(name)}&item_code=${encodeURIComponent(code)}`, { method: 'PUT' });
+                showMessageModal("Значение успешно обновлено!");  // ← THÊM
+            } else {
+                await fetchAPI(`/enum-items?id_enum=${currentEnumId}&item_name=${encodeURIComponent(name)}&item_code=${encodeURIComponent(code)}`, { method: 'POST' });
+                showMessageModal("Значение успешно добавлено!");   // ← THÊM
+            }
+            closeModal('modal-enumitem');
+            await loadEnumItems(currentEnumId);
+        } catch (e) {
+            console.error("Error:", e);
+            showMessageModal("Ошибка: " + (e.message || "Не удалось сохранить"), true);
+        }
+    }
+
+    async function deleteEnumItem(id) {
+        const row = document.querySelector(`#enum-items-table button[onclick*="deleteEnumItem(${id})"]`).closest('tr');
+        const itemName = row ? row.cells[1].textContent : 'это значение';
+        showConfirmModal(`Удалить значение "${itemName}"?`, async () => {
+            try {
+                await fetchAPI(`/enum-items/${id}`, { method: 'DELETE' });
+                await loadEnumItems(currentEnumId);
+            } catch (e) {
+                showMessageModal("Ошибка: " + e.message, true);
+            }
+        });
+    }
+
+    async function moveEnumItemUp(id) {
+        try {
+            await fetchAPI(`/enum-items/${id}/up`, { method: 'PUT' });
+            await loadEnumItems(currentEnumId);
+        } catch (e) {
+            showMessageModal("Ошибка: " + e.message, true);
+        }
+    }
+
+    async function moveEnumItemDown(id) {
+        try {
+            await fetchAPI(`/enum-items/${id}/down`, { method: 'PUT' });
+            await loadEnumItems(currentEnumId);
+        } catch (e) {
+            showMessageModal("Ошибка: " + e.message, true);
+        }
+    }
+
+    // ============ UNITS ============
+    async function loadUnits() {
+        try {
+            const units = await fetchAPI('/units');
+            const container = document.getElementById('units-table');
+            container.innerHTML = `
+                <table>
+                    <thead><tr><th>Название</th><th>Обозначение</th><th>Только целые</th><th>Действия</th></tr></thead>
+                    <tbody>
+                        ${units.map(u => `
+                            <tr>
+                                <td>${u.name}</td>
+                                <td>${u.short_name}</td>
+                                <td>${u.is_integer_only ? '✓' : ''}</td>
+                                <td>
+                                    <button class="btn-outline btn-sm" onclick="editUnit(${u.id_unit}, '${u.name}', '${u.short_name}', ${u.is_integer_only})">✏️</button>
+                                    <button class="btn-danger btn-sm" onclick="deleteUnit(${u.id_unit})">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } catch (e) {
+            console.error('Error loading units:', e);
+        }
+    }
+
+    // ============ LOAD CATEGORY PARAMS FOR PRODUCT MODAL ============
+    async function loadCategoryParamsForProduct(categoryId, productId = null) {
+        console.log("loadCategoryParamsForProduct called - categoryId:", categoryId, "productId:", productId);
+        try {
+            const params = await fetchAPI(`/categories/${categoryId}/parameters`);
+            const units = await fetchAPI('/units');  // Lấy danh sách đơn vị
+            
+            console.log("Params received:", params);
+            const container = document.getElementById('prod-params-container');
+            
+            if (!params || params.length === 0) {
+                container.innerHTML = '<div class="loading">Нет характеристик для этой категории</div>';
+                return;
+            }
+            
+            let html = '<div class="card" style="margin-top: 10px;"><div class="card-body">';
+            for (const p of params) {
+                let inputHtml = '';
+                if (p.param_type_code === 'enum') {
+                    const enumValues = await fetchAPI(`/parameters/${p.id_parameter}/enum-values`);
+                    let select = `<select id="param-${p.id_parameter}" class="param-select" data-param-id="${p.id_parameter}">`;
+                    select += `<option value="">— Выберите —</option>`;
+                    for (const ev of enumValues) {
+                        select += `<option value="${ev.id_enum_value}">${ev.value_name}</option>`;
+                    }
+                    select += `</select>`;
+                    inputHtml = select;
+                    
+                    html += `
+                        <div class="param-row">
+                            <div class="param-label">${p.name} ${p.is_mandatory ? '<span class="badge br">обяз.</span>' : ''}</div>
+                            <div class="param-input">${inputHtml}</div>
+                        </div>
+                    `;
+                } else if (p.param_type_code === 'integer') {
+                    let rangeText = '';
+                    if (p.min_value !== null && p.min_value !== undefined && 
+                        p.max_value !== null && p.max_value !== undefined) {
+                        rangeText = `<small style="color: #888; display: block; font-size: 11px;">${p.min_value} - ${p.max_value}</small>`;
+                    } else if (p.min_value !== null && p.min_value !== undefined) {
+                        rangeText = `<small style="color: #888; display: block; font-size: 11px;">≥ ${p.min_value}</small>`;
+                    } else if (p.max_value !== null && p.max_value !== undefined) {
+                        rangeText = `<small style="color: #888; display; block; font-size: 11px;">≤ ${p.max_value}</small>`;
+                    }
+                    
+                    let minAttr = p.min_value !== null ? `min="${p.min_value}"` : '';
+                    let maxAttr = p.max_value !== null ? `max="${p.max_value}"` : '';
+                    
+                    // 🔥 QUAN TRỌNG: Lấy step từ base_unit_id của parameter (KHÔNG phải đơn vị sản phẩm)
+                    let stepValue = "any";
+                    if (p.base_unit_id) {
+                        const baseUnit = units.find(u => u.id_unit === p.base_unit_id);
+                        if (baseUnit && baseUnit.is_integer_only === true) {
+                            stepValue = "1";
+                        } else {
+                            stepValue = "any";
+                        }
+                    }
+                    
+                    console.log(`Param ${p.name}: base_unit_id=${p.base_unit_id}, step=${stepValue}`);  // Debug
+                    
+                    inputHtml = `<input type="number" id="param-${p.id_parameter}" class="param-input-number" data-param-id="${p.id_parameter}" placeholder="Введите число" step="${stepValue}" ${minAttr} ${maxAttr} onchange="validateNumberInput(this, ${p.min_value || 'null'}, ${p.max_value || 'null'})">`;
+                    
+                    html += `
+                        <div class="param-row">
+                            <div class="param-label">
+                                ${p.name} ${p.is_mandatory ? '<span class="badge br">обяз.</span>' : ''}
+                                ${rangeText}
+                            </div>
+                            <div class="param-input">${inputHtml}</div>
+                        </div>
+                    `;
+                } else {
+                    inputHtml = `<input type="text" id="param-${p.id_parameter}" class="param-input-text" data-param-id="${p.id_parameter}" placeholder="Введите значение">`;
+                    html += `
+                        <div class="param-row">
+                            <div class="param-label">${p.name} ${p.is_mandatory ? '<span class="badge br">обяз.</span>' : ''}</div>
+                            <div class="param-input">${inputHtml}</div>
+                        </div>
+                    `;
+                }
+            }
+            html += '</div></div>';
+            container.innerHTML = html;
+            
+            if (productId) {
+                console.log("Loading current values for product:", productId);
+                await loadCurrentProductParameterValues(productId, params);
+            }
+        } catch(e) {
+            console.error('Error loading category params:', e);
+            document.getElementById('prod-params-container').innerHTML = '<div class="loading">Ошибка загрузки характеристик</div>';
+        }
+    }
+
+    async function loadCurrentProductParameterValues(productId, paramsList) {
+        console.log("loadCurrentProductParameterValues called with productId:", productId);
+        try {
+            const currentValues = await fetchAPI(`/products/${productId}/parameters`);
+            console.log("Current values from API:", currentValues);
+            
+            const valueMap = {};
+            for (const v of currentValues) {
+                valueMap[v.id_parameter] = v;
+            }
+            
+            for (const p of paramsList) {
+                const currentValue = valueMap[p.id_parameter];
+                const element = document.getElementById(`param-${p.id_parameter}`);
+                console.log(`Param ${p.id_parameter} (${p.name}): element=`, element, "currentValue=", currentValue);
+                
+                if (!element) continue;
+                
+                if (p.param_type_code === 'enum') {
+                    if (currentValue && currentValue.value) {
+                        for (let i = 0; i < element.options.length; i++) {
+                            if (element.options[i].text === currentValue.value) {
+                                element.selectedIndex = i;
+                                console.log(`Set enum to: ${currentValue.value}`);
+                                break;
+                            }
+                        }
+                    }
+                } else if (p.param_type_code === 'integer') {
+                    if (currentValue && currentValue.value !== undefined && currentValue.value !== null) {
+                        element.value = currentValue.value;
+                        console.log(`Set integer to: ${currentValue.value}`);
+                    }
+                }
+            }
+        } catch(e) {
+            console.error("Error in loadCurrentProductParameterValues:", e);
+        }
+    }
+
+    // ============ LOAD ENUMS FOR DROPDOWN ============
+    async function loadEnumList() {
+        console.log("loadEnumList called");
+        try {
+            const enums = await fetchAPI('/enums');
+            console.log("Enums received:", enums);
+            
+            const activeModal = document.querySelector('.modal.active');
+            let enumSelect = null;
+            
+            if (activeModal) {
+                enumSelect = activeModal.querySelector('#f-char-enum');
+            }
+            if (!enumSelect) {
+                enumSelect = document.getElementById('f-char-enum');
+            }
+            
+            if (!enumSelect) {
+                console.error("f-char-enum element not found!");
+                return;
+            }
+            
+            enumSelect.innerHTML = '<option value="">— выберите —</option>';
+            for (const e of enums) {
+                enumSelect.innerHTML += `<option value="${e.id_enum}">${e.name} (${e.code})</option>`;
+            }
+            console.log("Dropdown populated, total options:", enumSelect.options.length);
+        } catch(e) {
+            console.error("Error loading enums:", e);
+        }
+    }
+
+    function showUnitModal(unit = null) {
+        document.getElementById('unit-modal-title').textContent = unit ? 'Редактировать единицу' : 'Новая единица измерения';
+        document.getElementById('unit-name').value = unit ? unit.name : '';
+        document.getElementById('unit-short').value = unit ? unit.short_name : '';
+        document.getElementById('unit-integer-only').checked = unit ? unit.is_integer_only : false;
+        window.currentUnitEdit = unit;
+        showModal('modal-unit');
+    }
+
+    function editUnit(id, name, short, integerOnly) {
+        showUnitModal({ 
+            id_unit: id, 
+            name: name, 
+            short_name: short, 
+            is_integer_only: integerOnly 
+        });
+    }
+
+    async function saveUnit() {
+        const name = document.getElementById('unit-name').value;
+        const short = document.getElementById('unit-short').value;
+        const integerOnly = document.getElementById('unit-integer-only').checked;
+        
+        if (!name || !short) {
+            showMessageModal("Введите название и обозначение", true);
+            return;
+        }
+        
+        try {
+            if (window.currentUnitEdit) {
+                await fetchAPI(`/units/${window.currentUnitEdit.id_unit}?name=${encodeURIComponent(name)}&short_name=${encodeURIComponent(short)}&is_integer_only=${integerOnly}`, { method: 'PUT' });
+                showMessageModal("Единица измерения успешно обновлена!");  // ← THÊM
+            } else {
+                await fetchAPI(`/units?name=${encodeURIComponent(name)}&short_name=${encodeURIComponent(short)}&is_integer_only=${integerOnly}`, { method: 'POST' });
+                showMessageModal("Единица измерения успешно создана!");    // ← THÊM
+            }
+            closeModal('modal-unit');
+            await loadUnits();
+        } catch (e) {
+            showMessageModal("Ошибка: " + e.message, true);
+        }
+    }
+
+    async function deleteUnit(id) {
+        const row = document.querySelector(`#units-table button[onclick*="deleteUnit(${id})"]`).closest('tr');
+        const unitName = row ? row.cells[0].textContent : 'эту единицу';
+        showConfirmModal(`Удалить единицу измерения "${unitName}"?`, async () => {
+            try {
+                await fetchAPI(`/units/${id}`, { method: 'DELETE' });
+                await loadUnits();
+            } catch (e) {
+                showMessageModal("Ошибка: " + e.message, true);
+            }
+        });
+    }
+
+    // ============ NAVIGATION ============
+    function navigate(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${page}`).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.nav-btn[data-page="${page}"]`).classList.add('active');
+        document.getElementById('topbar').innerHTML = page === 'catalog' ? 'Каталог' : (page === 'enums' ? 'Перечисления' : 'Единицы измерения');
+        
+        if (page === 'enums') loadEnums();
+        if (page === 'units') loadUnits();
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => navigate(btn.dataset.page));
+    });
+
+    // ============ INIT ============
+    loadCategories();
+    loadUnits();
+    // ============ MANAGING CATEGORY PARAMETR ============
+    let currentEditingCategoryId = null;
+
+    async function loadCategoryParametersForEdit(categoryId) {
+        try {
+            const params = await fetchAPI(`/categories/${categoryId}/parameters`);
+            const container = document.getElementById('category-params-list');
+            if (!params || params.length === 0) {
+                container.innerHTML = '<div class="loading">Нет характеристик</div>';
+                return;
+            }
+            container.innerHTML = '';
+            for (const p of params) {
+                const mandatoryText = p.is_mandatory ? '<span class="br">обяз.</span>' : '';
+                container.innerHTML += `
+                    <div class="param-row" data-param-id="${p.id_parameter}">
+                        <div class="param-name">${p.name} ${mandatoryText}</div>
+                        <div class="param-type">${p.param_type_code}</div>
+                        <div class="param-mandatory">
+                            <label style="display:flex; align-items:center; gap:5px;">
+                                <input type="checkbox" class="mandatory-checkbox" data-id="${p.id_parameter}" ${p.is_mandatory ? 'checked' : ''}> Обязательная
+                            </label>
+                        </div>
+                        <div class="param-actions">
+                            <button class="btn-outline btn-sm edit-param-btn" data-id="${p.id_parameter}">✏️</button>
+                            <button class="btn-outline btn-sm move-up" data-id="${p.id_parameter}">▲</button>
+                            <button class="btn-outline btn-sm move-down" data-id="${p.id_parameter}">▼</button>
+                            <button class="btn-danger btn-sm remove-param" data-id="${p.id_parameter}">✕</button>
+                        </div>
+                    </div>
+                `;
+            }
+            attachCategoryParamEvents(categoryId);
+        } catch (e) {
+            console.error('Error loading category parameters:', e);
+            document.getElementById('category-params-list').innerHTML = '<div class="loading">Ошибка загрузки</div>';
+        }
+    }
+
+    function attachCategoryParamEvents(categoryId) {
+        // Mandatory checkbox
+        document.querySelectorAll('#category-params-list .mandatory-checkbox').forEach(cb => {
+            cb.onchange = async () => {
+                const paramId = cb.dataset.id;
+                const isMandatory = cb.checked;
+                await fetchAPI(`/categories/${categoryId}/parameters/${paramId}?is_mandatory=${isMandatory}`, { method: 'PUT' });
+            };
+        });
+        
+        // Edit button ✏️ 
+        document.querySelectorAll('#category-params-list .edit-param-btn').forEach(btn => {
+            btn.onclick = () => {
+                const paramId = btn.dataset.id;
+                editCategoryParameter(paramId);
+            };
+        });
+        
+        // Remove button
+        document.querySelectorAll('#category-params-list .remove-param').forEach(btn => {
+            btn.onclick = async () => {
+                const paramId = btn.dataset.id;
+                const paramName = btn.closest('.param-row').querySelector('.param-name').textContent;
+                showConfirmModal(`Удалить характеристику "${paramName}" из категории?`, async () => {
+                    try {
+                        await fetchAPI(`/categories/${categoryId}/parameters/${paramId}`, { method: 'DELETE' });
+                        await loadCategoryParametersForEdit(categoryId);
+                    } catch(e) {
+                        showMessageModal("Ошибка удаления: " + e.message, true);
+                    }
+                });
+            };
+        });
+        
+        //  ▲ 
+        document.querySelectorAll('#category-params-list .move-up').forEach(btn => {
+            btn.onclick = async () => {
+                const paramId = btn.dataset.id;
+                try {
+                    await fetchAPI(`/categories/${categoryId}/parameters/${paramId}/up`, { method: 'PUT' });
+                    await loadCategoryParametersForEdit(categoryId);
+                } catch (e) {
+                    showMessageModal("Нельзя переместить выше", true);
+                }
+            };
+        });
+
+        // ▼ 
+        document.querySelectorAll('#category-params-list .move-down').forEach(btn => {
+            btn.onclick = async () => {
+                const paramId = btn.dataset.id;
+                try {
+                    await fetchAPI(`/categories/${categoryId}/parameters/${paramId}/down`, { method: 'PUT' });
+                    await loadCategoryParametersForEdit(categoryId);
+                } catch (e) {
+                    showMessageModal("Нельзя переместить ниже", true);
+                }
+            };
+        });
+    }
+
+    async function showAddParamToCategory(categoryId) {
+        window.currentCategoryForParam = categoryId;
+        
+        document.getElementById('m-char-title').textContent = "Новая характеристика";
+        document.getElementById('m-char-save').textContent = "Добавить";
+        document.getElementById('f-char-existing').value = "";
+        document.getElementById('f-char-name').value = "";
+        document.getElementById('f-char-code').value = "";
+        document.getElementById('f-char-type').value = "";
+        document.getElementById('f-char-req').checked = false;
+        document.getElementById('char-enum-row').style.display = "none";
+        document.getElementById('char-num-rows').style.display = "none";
+        document.getElementById('char-new-form').style.display = "block";
+        document.getElementById('f-char-unit').value = "";
+        
+        //  Reset dropdown enum
+        const enumSelect = document.getElementById('f-char-enum');
+        if (enumSelect) {
+            enumSelect.innerHTML = '<option value="">— выберите —</option>';
+        }
+
+        const typeSelect = document.getElementById('f-char-type');
+        typeSelect.onchange = function() {
+            const isEnum = this.value === 'enum';
+            const isNumeric = this.value === 'numeric';
+            const enumRow = document.getElementById('char-enum-row');
+            const numRows = document.getElementById('char-num-rows');
+            
+            if (isEnum) {
+                enumRow.style.display = 'block';
+                numRows.style.display = 'none';
+                loadEnumList();  
+            } else if (isNumeric) {
+                enumRow.style.display = 'none';
+                numRows.style.display = 'grid';
+            } else {
+                enumRow.style.display = 'none';
+                numRows.style.display = 'none';
+            }
+        };
+        typeSelect.onchange();
+        
+        fetchAPI('/units').then(units => {
+            const unitSelect = document.getElementById('f-char-unit');
+            unitSelect.innerHTML = '<option value="">— нет —</option>';
+            units.forEach(u => {
+                unitSelect.innerHTML += `<option value="${u.id_unit}">${u.name} (${u.short_name})</option>`;
+            });
+        }).catch(e => console.error("Error loading units:", e));
+
+        try {
+            const allParams = await fetchAPI('/parameters');
+            const existingParams = await fetchAPI(`/categories/${categoryId}/parameters`);
+            const existingIds = existingParams.map(p => p.id_parameter);
+            const availableParams = allParams.filter(p => !existingIds.includes(p.id_parameter));
+            
+            const selectExisting = document.getElementById('f-char-existing');
+            selectExisting.innerHTML = '<option value="">— создать новую —</option>';
+            for (const p of availableParams) {
+                selectExisting.innerHTML += `<option value="${p.id_parameter}">${p.name} (${p.code})</option>`;
+            }
+
+        } catch(e) {
+            console.error("Error loading existing params:", e);
+        }
+        
+        const saveBtn = document.getElementById('m-char-save');
+        const oldOnClick = saveBtn.onclick;
+        
+        saveBtn.onclick = async () => {
+            const selectedExisting = document.getElementById('f-char-existing').value;
+            let paramId = null;
+            
+            if (selectedExisting) {
+                paramId = parseInt(selectedExisting);
+            } else {
+                const name = document.getElementById('f-char-name').value.trim();
+                const code = document.getElementById('f-char-code').value.trim();
+                const type = document.getElementById('f-char-type').value;
+                
+                if (!name || !code) {
+                    showMessageModal("Введите название и код характеристики", true);
+                    return;
+                }
+                
+                // 🔥 THÊM KIỂM TRA NÀY
+                if (type === 'enum') {
+                    const selectedEnumId = document.getElementById('f-char-enum').value;
+                    if (!selectedEnumId || selectedEnumId === '') {
+                        showMessageModal("Для типа enum необходимо выбрать перечисление", true);
+                        return;
+                    }
+                }
+                
+                let paramTypeId = 1; // string
+                if (type === 'numeric') paramTypeId = 2;
+                if (type === 'enum') paramTypeId = 3;
+                
+                try {
+                    const baseUnitId = document.getElementById('f-char-unit').value || null;
+                    let url = `${API}/parameters?name=${encodeURIComponent(name)}&short_name=${encodeURIComponent(code)}&code=${encodeURIComponent(code)}&id_param_type=${paramTypeId}`;
+                    
+                    if (baseUnitId) {
+                        url += `&base_unit_id=${baseUnitId}`;
+                    }
+                    
+                    // 🔥 LƯU Ý: ĐOẠN NÀY BỊ TRÙNG LẶP (2 lần kiểm tra type === 'numeric')
+                    // Cần xóa một đoạn
+                    if (type === 'numeric') {
+                        const minVal = document.getElementById('f-char-min').value;
+                        const maxVal = document.getElementById('f-char-max').value;
+                        if (minVal) url += `&min_value=${minVal}`;
+                        if (maxVal) url += `&max_value=${maxVal}`;
+                    }
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        showMessageModal("Ошибка создания характеристики: " + JSON.stringify(errorData.detail || errorData), true);
+                        return;
+                    }
+                    
+                    const newParam = await response.json();
+                    paramId = newParam.id_parameter;
+
+                    if (type === 'enum') {
+                        const selectedEnumId = document.getElementById('f-char-enum')?.value;
+                        if (selectedEnumId) {
+                            const enumItems = await fetchAPI(`/enums/${selectedEnumId}/items`);
+                            for (const item of enumItems) {
+                                await fetchAPI(`/enum-values?parameter_id=${paramId}&value_name=${encodeURIComponent(item.item_name)}&value_code=${encodeURIComponent(item.item_code)}`, { method: 'POST' });
+                            }
+                        }
+                    }
+                } catch(e) {
+                    console.error("Fetch error:", e);
+                    showMessageModal("Ошибка сети при создании характеристики: " + e.message, true);
+                    return;
+                }
+            }
+            
+            if (paramId) {
+                const isMandatory = document.getElementById('f-char-req').checked;
+                try {
+                    const addUrl = `/categories/${window.currentCategoryForParam}/parameters?id_parameter=${paramId}&is_mandatory=${isMandatory}`;
+                    await fetchAPI(addUrl, { method: 'POST' });
+                    await loadCategoryParametersForEdit(window.currentCategoryForParam);
+                    closeModal('m-char');
+                    showMessageModal("Характеристика успешно добавлена!");
+                } catch(e) {
+                    showMessageModal("Ошибка добавления характеристики в категорию: " + e.message, true);
+                }
+            }
+        };
+        
+        const modalClose = document.getElementById('m-char').querySelector('.btn-secondary');
+        modalClose.onclick = () => {
+            saveBtn.onclick = oldOnClick;
+            closeModal('m-char');
+        };
+        
+        showModal('m-char');
+    }
+
+        // ============ EDIT PARAMETER  ============
+    async function editCategoryParameter(paramId) {
+        try {
+            const allParams = await fetchAPI('/parameters');
+            const param = allParams.find(p => p.id_parameter === parseInt(paramId));
+            
+            if (!param) {
+                showMessageModal("Не удалось найти характеристику", true);
+                return;
+            }
+            
+            let paramType = 'string';
+            if (param.id_param_type === 2) paramType = 'integer';
+            if (param.id_param_type === 3) paramType = 'enum';
+            
+            document.getElementById('m-char-title').textContent = `Редактировать: ${param.name}`;
+            document.getElementById('m-char-save').textContent = "Сохранить";
+            
+            document.getElementById('f-char-name').value = param.name;
+            document.getElementById('f-char-code').value = param.code;
+
+            // 🔥 THÊM ĐOẠN NÀY VÀO ĐÂY
+            fetchAPI('/units').then(units => {
+                const unitSelect = document.getElementById('f-char-unit');
+                unitSelect.innerHTML = '<option value="">— нет —</option>';
+                units.forEach(u => {
+                    unitSelect.innerHTML += `<option value="${u.id_unit}">${u.name} (${u.short_name})</option>`;
+                });
+                if (param.base_unit_id) {
+                    unitSelect.value = param.base_unit_id;
+                }
+            });
+            
+            let typeValue = 'string';
+            if (paramType === 'enum') typeValue = 'enum';
+            else if (paramType === 'integer') typeValue = 'numeric';
+            document.getElementById('f-char-type').value = typeValue;
+            
+            document.getElementById('f-char-existing').style.display = 'none';
+            document.getElementById('char-new-form').style.display = 'block';
+            
+            const typeSelect = document.getElementById('f-char-type');
+            typeSelect.onchange = function() {
+                const isEnum = this.value === 'enum';
+                const isNumeric = this.value === 'numeric';
+                document.getElementById('char-enum-row').style.display = isEnum ? 'block' : 'none';
+                document.getElementById('char-num-rows').style.display = isNumeric ? 'grid' : 'none';
+            };
+            typeSelect.onchange();
+            
+            if (paramType === 'integer') {
+                if (param.min_value) document.getElementById('f-char-min').value = param.min_value;
+                if (param.max_value) document.getElementById('f-char-max').value = param.max_value;
+                document.getElementById('char-num-rows').style.display = 'grid';
+            }
+            
+            if (paramType === 'enum') {
+                try {
+                    const allEnums = await fetchAPI('/enums');
+                    
+                    let currentEnumId = null;
+                    try {
+                        const enumValues = await fetchAPI(`/parameters/${paramId}/enum-values`);
+                        console.log("Existing enum values:", enumValues);
+                        
+                        if (enumValues && enumValues.length > 0) {
+                            const firstValueCode = enumValues[0].value_code;
+                            console.log("First value code:", firstValueCode);
+                            
+                            for (const enumObj of allEnums) {
+                                const enumItems = await fetchAPI(`/enums/${enumObj.id_enum}/items`);
+                                const found = enumItems.find(item => item.item_code === firstValueCode);
+                                if (found) {
+                                    currentEnumId = enumObj.id_enum;
+                                    console.log(`Found enum: ${enumObj.name} (ID: ${currentEnumId})`);
+                                    break;
+                                }
+                            }
+                        }
+                    } catch(e) {
+                        console.log("Could not determine current enum:", e);
+                    }
+                    
+                    console.log("Current enum ID:", currentEnumId);
+                    
+                    const enumRow = document.getElementById('char-enum-row');
+                    enumRow.style.display = 'block';
+                    
+                    let enumHtml = '<label>Перечисление <span style="color:red;">*</span></label>';
+                    enumHtml += '<select id="f-char-enum-select" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ddd;">';
+                    enumHtml += '<option value="">— выберите перечисление —</option>';
+                    
+                    for (const e of allEnums) {
+                        const selected = (currentEnumId === e.id_enum) ? 'selected' : '';
+                        enumHtml += `<option value="${e.id_enum}" ${selected}>${e.name} (${e.code})</option>`;
+                    }
+                    
+                    enumHtml += '</select>';
+                    enumHtml += '<div style="margin-top:10px;">';
+                    enumHtml += '<label>Значения перечисления (предпросмотр)</label>';
+                    enumHtml += '<div id="enum-values-preview" style="border:1px solid #ddd; border-radius:4px; padding:8px; max-height:150px; overflow-y:auto; background:#f9f9f9; margin-top:5px;">';
+                    
+                    if (currentEnumId) {
+                        enumHtml += '<span style="color:#999;">Загрузка...</span>';
+                    } else {
+                        enumHtml += '<span style="color:#999;">Выберите перечисление</span>';
+                    }
+                    
+                    enumHtml += '</div>';
+                    enumHtml += '</div>';
+                    
+                    enumRow.innerHTML = enumHtml;
+                    
+                    const enumSelect = document.getElementById('f-char-enum-select');
+                    enumSelect.onchange = async () => {
+                        const enumId = enumSelect.value;
+                        const previewDiv = document.getElementById('enum-values-preview');
+                        
+                        if (!enumId) {
+                            previewDiv.innerHTML = '<span style="color:#999;">Выберите перечисление</span>';
+                            return;
+                        }
+                        
+                        try {
+                            const enumItems = await fetchAPI(`/enums/${enumId}/items`);
+                            previewDiv.innerHTML = '';
+                            
+                            if (enumItems && enumItems.length > 0) {
+                                for (const item of enumItems) {
+                                    previewDiv.innerHTML += `<div style="padding:3px 0;">✓ ${item.item_name} (${item.item_code})</div>`;
+                                }
+                            } else {
+                                previewDiv.innerHTML = '<span style="color:#999;">Нет значений</span>';
+                            }
+                        } catch(e) {
+                            previewDiv.innerHTML = '<span style="color:red;">Ошибка загрузки</span>';
+                        }
+                    };
+                    
+                    if (currentEnumId) {
+                        enumSelect.value = currentEnumId;
+                        await enumSelect.onchange();
+                    }
+                    
+                    window.currentEditingEnumId = currentEnumId;
+                    
+                } catch(e) {
+                    console.error("Error loading enums:", e);
+                    const enumRow = document.getElementById('char-enum-row');
+                    enumRow.style.display = 'block';
+                    enumRow.innerHTML = '<div style="color:red; padding:8px;">Ошибка загрузки списка перечислений</div>';
+                }
+            }
+            
+            window.currentEditingParamId = paramId;
+            window.currentEditingCategoryId = currentEditingCategoryId;
+            
+            const saveBtn = document.getElementById('m-char-save');
+            const oldOnClick = saveBtn.onclick;
+            
+            saveBtn.onclick = async () => {
+                await saveParameterChanges();
+                saveBtn.onclick = oldOnClick;
+            };
+            
+            const closeBtn = document.querySelector('#m-char .btn-secondary');
+            const oldCloseClick = closeBtn.onclick;
+            closeBtn.onclick = () => {
+                saveBtn.onclick = oldOnClick;
+                closeBtn.onclick = oldCloseClick;
+                closeModal('m-char');
+            };
+            
+            showModal('m-char');
+            
+        } catch(e) {
+            console.error('Error loading parameter:', e);
+            showMessageModal("Ошибка загрузки данных характеристики", true);
+        }
+    }
+
+    async function saveParameterChanges() {
+        const paramId = window.currentEditingParamId;
+        const categoryId = window.currentEditingCategoryId;
+        
+        const name = document.getElementById('f-char-name').value.trim();
+        const code = document.getElementById('f-char-code').value.trim();
+        const type = document.getElementById('f-char-type').value;
+        const isMandatory = document.getElementById('f-char-req').checked;
+        
+        if (!name || !code) {
+            showMessageModal("Введите название и код характеристики", true);
+            return;
+        }
+        
+        let id_param_type = 1; // string
+        if (type === 'numeric') id_param_type = 2;
+        if (type === 'enum') id_param_type = 3;
+        
+        try {
+            let url = `/parameters/${paramId}?name=${encodeURIComponent(name)}&short_name=${encodeURIComponent(code)}&code=${encodeURIComponent(code)}&id_param_type=${id_param_type}`;
+            
+            // 🔥 THÊM base_unit_id VÀO ĐÂY
+            const baseUnitId = document.getElementById('f-char-unit').value || null;
+            if (baseUnitId) {
+                url += `&base_unit_id=${baseUnitId}`;
+            }
+            
+            if (type === 'numeric') {
+                const minVal = document.getElementById('f-char-min').value;
+                const maxVal = document.getElementById('f-char-max').value;
+                if (minVal) url += `&min_value=${minVal}`;
+                if (maxVal) url += `&max_value=${maxVal}`;
+            }
+            
+            await fetchAPI(url, { method: 'PUT' });
+            
+            if (type === 'enum') {
+                const selectedEnumId = document.getElementById('f-char-enum-select')?.value;
+                
+                if (selectedEnumId) {
+                    const enumItems = await fetchAPI(`/enums/${selectedEnumId}/items`);
+                    
+                    try {
+                        const oldEnumValues = await fetchAPI(`/parameters/${paramId}/enum-values`);
+                        for (const ev of oldEnumValues) {
+                            try {
+                                await fetchAPI(`/enum-values/${ev.id_enum_value}`, { method: 'DELETE' });
+                            } catch(e) {
+                                console.log(`Could not delete ${ev.id_enum_value}:`, e);
+                            }
+                        }
+                    } catch(e) {
+                        console.log("No old enum values to delete");
+                    }
+                    
+                    for (const item of enumItems) {
+                        await fetchAPI(`/enum-values?parameter_id=${paramId}&value_name=${encodeURIComponent(item.item_name)}&value_code=${encodeURIComponent(item.item_code)}`, { 
+                            method: 'POST' 
+                        });
+                    }
+                    
+                    console.log(`Saved ${enumItems.length} enum values for parameter ${paramId}`);
+                }
+            }
+            
+            await fetchAPI(`/categories/${categoryId}/parameters/${paramId}?is_mandatory=${isMandatory}`, { method: 'PUT' });
+            
+            closeModal('m-char');
+            await loadCategoryParametersForEdit(categoryId);
+            showMessageModal("✓ Характеристика успешно обновлена!");
+            
+        } catch(e) {
+            console.error('Error saving:', e);
+            showMessageModal("❌ Ошибка сохранения: " + e.message);
+        }
+    }
+
+    document.getElementById('btn-add-category-param').onclick = () => {
+        if (currentEditingCategoryId) {
+            showAddParamToCategory(currentEditingCategoryId);
+        } else {
+            showMessageModal("Сначала сохраните категорию", true);
+        }
+    };
+    // ============ PARAMETR MANAGEMENT  ============
+    let currentParamsProductId = null;
+    let currentParamsData = [];
+
+    async function editProductParams(id, name) {
+        console.log("EditProductParams called, ID:", id, "Name:", name);
+        try {
+            currentParamsProductId = id;
+            document.getElementById('modal-params-title').innerHTML = `Характеристики: ${name}`;
+            
+            const product = await fetchAPI(`/products/${id}`);
+            const categoryParams = await fetchAPI(`/categories/${product.category_id}/parameters`);
+            const currentValues = await fetchAPI(`/products/${id}/parameters`);
+            
+            const valueMap = {};
+            for (const v of currentValues) {
+                valueMap[v.id_parameter] = v;
+            }
+            
+            const container = document.getElementById('params-list');
+            container.innerHTML = '';
+            
+            for (const p of categoryParams) {
+                const currentValue = valueMap[p.id_parameter];
+                let displayValue = '';
+                
+                if (p.param_type_code === 'enum') {
+                    if (currentValue && currentValue.value) {
+                        displayValue = currentValue.value;
+                    } else {
+                        displayValue = '— Не выбрано —';
+                    }
+                    container.innerHTML += `
+                        <div class="param-row">
+                            <div class="param-label">${p.name}</div>
+                            <div class="param-value">${displayValue}</div>
+                        </div>
+                    `;
+                } else if (p.param_type_code === 'integer') {
+                    if (currentValue && currentValue.value !== undefined && currentValue.value !== null) {
+                        displayValue = currentValue.value;
+                    } else {
+                        displayValue = '— не указано —';
+                    }
+                    container.innerHTML += `
+                        <div class="param-row">
+                            <div class="param-label">${p.name}</div>
+                            <div class="param-value">${displayValue}</div>
+                        </div>
+                    `;
+                } else {
+                    if (currentValue && currentValue.value) {
+                        displayValue = currentValue.value;
+                    } else {
+                        displayValue = '— не указано —';
+                    }
+                    container.innerHTML += `
+                        <div class="param-row">
+                            <div class="param-label">${p.name}</div>
+                            <div class="param-value">${displayValue}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            showModal('modal-params');
+        } catch (err) {
+            console.error("Error in editProductParams:", err);
+            showMessageModal("Ошибка загрузки характеристик: " + err.message, true);
+        }
+    }
+    async function saveParamsFromModal() {
+        if (!currentParamsProductId) return;
+
+        const product = await fetchAPI(`/products/${currentParamsProductId}`);
+        const categoryParams = await fetchAPI(`/categories/${product.category_id}/parameters`);
+
+        for (const p of categoryParams) {
+            const element = document.getElementById(`param-${p.id_parameter}`);
+            if (!element) continue;
+
+            if (p.param_type_code === 'enum') {
+                const valueEnum = element.value;
+                if (valueEnum) {
+                    await fetchAPI(`/products/${currentParamsProductId}/parameters/${p.id_parameter}?value_enum=${valueEnum}`, { method: 'PUT' });
+                } else {
+                    await fetchAPI(`/products/${currentParamsProductId}/parameters/${p.id_parameter}`, { method: 'DELETE' }).catch(() => {});
+                }
+            } else if (p.param_type_code === 'integer') {
+                const valueInt = element.value;
+                if (valueInt !== undefined && valueInt !== '') {
+                    await fetchAPI(`/products/${currentParamsProductId}/parameters/${p.id_parameter}?value_integer=${valueInt}`, { method: 'PUT' });
+                } else {
+                    await fetchAPI(`/products/${currentParamsProductId}/parameters/${p.id_parameter}`, { method: 'DELETE' }).catch(() => {});
+                }
+            } else {
+                const valueText = element.value;
+                if (valueText !== undefined && valueText !== '') {
+                    await fetchAPI(`/products/${currentParamsProductId}/parameters/${p.id_parameter}?value_string=${encodeURIComponent(valueText)}`, { method: 'PUT' });
+                } else {
+                    await fetchAPI(`/products/${currentParamsProductId}/parameters/${p.id_parameter}`, { method: 'DELETE' }).catch(() => {});
+                }
+            }
+        }
+
+        showMessageModal("✓ Характеристики сохранены!");
+        closeModal('modal-params');
+        const name = document.getElementById('modal-params-title').innerHTML.replace('Характеристики: ', '');
+        await editProductParams(currentParamsProductId, name);
+    }
+    document.getElementById('btn-toggle-filters').onclick = () => {
+        const panel = document.getElementById('filters-panel');
+        const isVisible = panel.style.display === 'block';
+        panel.style.display = isVisible ? 'none' : 'block';
+        document.getElementById('btn-toggle-filters').textContent = isVisible ? 'Фильтры ▼' : 'Фильтры ▲';
+    };
+
+    async function loadFilterEnums() {
+        try {
+            // Lấy enum_values trực tiếp từ parameter Цвет (id=2)
+            const colors = await fetchAPI('/parameters/2/enum-values');
+            const colorSelect = document.getElementById('filter-color');
+            colorSelect.innerHTML = '<option value="">— любой —</option>';
+            colors.forEach(c => {
+                colorSelect.innerHTML += `<option value="${c.id_enum_value}">${c.value_name}</option>`;
+            });
+            
+            // Lấy enum_values cho parameter Тема (id=1) nếu cần
+            const themes = await fetchAPI('/parameters/1/enum-values');
+            const themeSelect = document.getElementById('filter-theme');
+            themeSelect.innerHTML = '<option value="">— любая —</option>';
+            themes.forEach(t => {
+                themeSelect.innerHTML += `<option value="${t.id_enum_value}">${t.value_name}</option>`;
+            });
+            
+        } catch(e) {
+            console.error("Error loading filter enums:", e);
+        }
+    }
+
+    document.getElementById('apply-filters').onclick = () => {
+        const theme = document.getElementById('filter-theme').value;
+        const color = document.getElementById('filter-color').value;
+        const heightMin = document.getElementById('filter-height-min').value;
+        const heightMax = document.getElementById('filter-height-max').value;
+        const lengthMin = document.getElementById('filter-length-min').value;
+        const lengthMax = document.getElementById('filter-length-max').value;
+        const widthMin = document.getElementById('filter-width-min').value;
+        const widthMax = document.getElementById('filter-width-max').value;
+        const diamMin = document.getElementById('filter-diam-min').value;
+        const diamMax = document.getElementById('filter-diam-max').value;
+        const priceMin = document.getElementById('filter-price-min').value;
+        const priceMax = document.getElementById('filter-price-max').value;
+        
+        let url = `/products/filter?category_id=${currentCategoryId}`;
+        if (theme) url += `&theme=${theme}`;
+        if (color) url += `&color=${color}`;
+        if (heightMin) url += `&height_min=${heightMin}`;
+        if (heightMax) url += `&height_max=${heightMax}`;
+        if (lengthMin) url += `&length_min=${lengthMin}`;
+        if (lengthMax) url += `&length_max=${lengthMax}`;
+        if (widthMin) url += `&width_min=${widthMin}`;
+        if (widthMax) url += `&width_max=${widthMax}`;
+        if (diamMin) url += `&diam_min=${diamMin}`;
+        if (diamMax) url += `&diam_max=${diamMax}`;
+        if (priceMin) url += `&price_min=${priceMin}`;
+        if (priceMax) url += `&price_max=${priceMax}`;
+        
+        fetchAPI(url).then(data => {
+            renderProducts(data.items);
+        }).catch(e => console.error(e));
+    };
+
+    document.getElementById('reset-filters').onclick = () => {
+        document.getElementById('filter-theme').value = '';
+        document.getElementById('filter-color').value = '';
+        document.getElementById('filter-height-min').value = '';
+        document.getElementById('filter-height-max').value = '';
+        document.getElementById('filter-length-min').value = '';
+        document.getElementById('filter-length-max').value = '';
+        document.getElementById('filter-width-min').value = '';
+        document.getElementById('filter-width-max').value = '';
+        document.getElementById('filter-diam-min').value = '';
+        document.getElementById('filter-diam-max').value = '';
+        document.getElementById('filter-price-min').value = '';
+        document.getElementById('filter-price-max').value = '';
+        loadProducts();
+    };
+
+    loadFilterEnums();
+
+    function validateNumberInput(input, minVal, maxVal) {
+        let value = parseFloat(input.value);
+        if (isNaN(value)) return;
+        
+        if (minVal !== null && value < minVal) {
+            input.value = minVal;
+        }
+        if (maxVal !== null && value > maxVal) {
+            input.value = maxVal;
+        }
+    }
+
+    // Ngăn nhập số âm cho các ô input số trong filter
+    const filterInputs = [
+        'filter-height-min', 'filter-height-max',
+        'filter-length-min', 'filter-length-max',  // 🔥 THÊM
+        'filter-width-min', 'filter-width-max',    // 🔥 THÊM
+        'filter-diam-min', 'filter-diam-max',
+        'filter-price-min', 'filter-price-max'
+    ];
+
+    filterInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', function() {
+                if (this.value < 0) this.value = 0;
+                if (this.value === '-') this.value = 0;
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === '-' || e.key === 'e') {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+
+    // Xử lý di chuyển danh mục
+    // Xử lý di chuyển danh mục
+    document.addEventListener('click', async function(e) {
+        if (e.target.classList.contains('move-up')) {
+            const id = e.target.dataset.id;
+            try {
+                await fetchAPI(`/categories/${id}/up`, { method: 'PUT' });
+                await loadCategories();  // Tải lại cây danh mục
+                // ❌ KHÔNG hiện thông báo
+            } catch (err) {
+                showMessageModal(err.message, true);  // Chỉ hiện khi lỗi
+            }
+        }
+        
+        if (e.target.classList.contains('move-down')) {
+            const id = e.target.dataset.id;
+            try {
+                await fetchAPI(`/categories/${id}/down`, { method: 'PUT' });
+                await loadCategories();  // Tải lại cây danh mục
+                // ❌ KHÔNG hiện thông báo
+            } catch (err) {
+                showMessageModal(err.message, true);  // Chỉ hiện khi lỗi
+            }
+        }
+    });
+
+
+
+</script>
+<!-- PRODUCT PARAMETERS MODAL -->
+<div id="modal-params" class="modal">
+    <div class="modal-content" style="width: 500px;">
+        <div class="modal-header">
+            <h3 id="modal-params-title">Характеристики</h3>
+            <button onclick="closeModal('modal-params')" style="background: none; border: none; font-size: 20px;">✕</button>
+        </div>
+        <div class="modal-body" id="modal-params-body">
+            <div id="params-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ДЛЯ ДОБАВЛЕНИЯ ХАРАКТЕРИСТИКИ -->
+<div id="m-char" class="modal">
+    <div class="modal-content" style="width: 550px;">
+        <div class="modal-header">
+            <h2 id="m-char-title">Новая характеристика</h2>
+            <button class="btn-secondary btn-sm" onclick="closeModal('m-char')">✕</button>
+        </div>
+        <div class="modal-body">
+            <!-- Выбрать из существующих -->
+            <div class="fg">
+                <label>Выбрать из существующих</label>
+                <select id="f-char-existing">
+                    <option value="">— создать новую —</option>
+                </select>
+            </div>
+            
+            <div id="char-new-form">
+                <!-- Название и Код -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Название</label>
+                        <input type="text" id="f-char-name" placeholder="Например: Высота">
+                    </div>
+                    <div class="form-group">
+                        <label>Код</label>
+                        <input type="text" id="f-char-code" placeholder="Например: HEIGHT_CM">
+                    </div>
+                </div>
+                
+                <!-- Тип данных и Базовая ЕИ -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Тип данных</label>
+                        <select id="f-char-type">
+                            <option value="">— выберите —</option>
+                            <option value="enum">enum (перечисление)</option>
+                            <option value="numeric">numeric (число)</option>
+                            <option value="string">string (строка)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Базовая ЕИ</label>
+                        <select id="f-char-unit">
+                            <option value="">— нет —</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Обязательная (checkbox) -->
+                <label style="display: flex; align-items: center; gap: 5px; margin-left: 0; padding-left: 0;">
+                    <input type="checkbox" id="f-char-req"> 
+                    <span>Обязательная</span>
+                </label>
+                
+                <div class="form-row" id="char-num-rows" style="display: none;">
+                    <div class="form-group">
+                        <label>Мин.</label>
+                        <input type="number" id="f-char-min" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Макс.</label>
+                        <input type="number" id="f-char-max" placeholder="100" min="0">
+                    </div>
+                </div>
+                
+                <div class="form-group" id="char-enum-row" style="display: none;">
+                    <label>Перечисление</label>
+                    <select id="f-char-enum">
+                        <option value="">— выберите —</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('m-char')">Отмена</button>
+            <button class="btn-primary" id="m-char-save">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<div id="m-del" class="modal">
+    <div class="modal-content" style="width: 320px;">
+        <div class="modal-header">
+            <h2>Подтвердите удаление</h2>
+            <button class="btn-secondary btn-sm" onclick="closeModal('m-del')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Удалить <b id="del-target">—</b></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('m-del')">Отмена</button>
+            <button class="btn-primary" id="m-del-ok" style="background:#c00;">Удалить</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="m-msg" class="modal">
+    <div class="modal-content" style="width: 320px;">
+        <div class="modal-header">
+            <h2 id="m-msg-title">✓ Успешно</h2>
+            <button class="btn-secondary btn-sm" onclick="closeModal('m-msg')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p id="m-msg-text" style="font-size: 14px;">—</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-primary" id="m-msg-ok" style="background: #28a745;">OK</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
